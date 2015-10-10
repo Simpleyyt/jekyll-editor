@@ -4,10 +4,11 @@
   "short_name": "Jekyll Editor",
   "description": "An markdown editor to write jekyll post.",
   "version": "1.0.0",
+  "default_locale": "en",
   "minimum_chrome_version": "33",
   "icons": {
     "16": "/editor.md/images/logos/editormd-logo-16x16.png",
-    "128": "/editor.md/images/logos/editormd-logo-120x120.png"
+    "128": "/editor.md/images/logos/editormd-logo-128x128.png"
   },
  "permissions": [
 	"storage",
