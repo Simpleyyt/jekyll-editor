@@ -60,19 +60,19 @@ var msgLang = {
     update_success: '更新博客成功！',
     create_success: '创建博客成功！',
     conflict: '错误！版本存在冲突。',
-    unknow: '未知错误！'
+    unknown: '未知错误！'
   },
   'zh-tw': {
     update_success: '更新博客成功！',
     create_success: '创建博客成功！',
     conflict: '错误！版本存在冲突。',
-    unknow: '未知错误！'
+    unknown: '未知错误！'
   },
   'en': {
     update_success: 'Update post successfully!',
     create_success: 'Create post successfully!',
     conflict: 'Error due to version conflict, please to webpage to solve that, or reload the online version before update!',
-    unknow: 'Error! Please check on web!'
+    unknown: 'Error! Please check on web!'
   }
 };
 
