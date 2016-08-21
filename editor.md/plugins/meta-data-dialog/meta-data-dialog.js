@@ -47,7 +47,7 @@
 			"en" : {
 				dialog : {
 					metaData : {
-					  meta : "Meat Data",
+					  meta : "Meta Data",
 						layout : "Layout",
 						title : 'Title',
 						categories : 'Categories',
