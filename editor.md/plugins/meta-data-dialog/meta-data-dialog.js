@@ -59,7 +59,7 @@
 				}
 			}
 		};
-		exports.fn.metaDataDialog = function(post, callback) {
+		exports.fn.metaDataDialog = function(meta, callback) {
 
 			      $.extend(true, this.lang, langs[this.lang.name]);
             var _this       = this;
@@ -72,7 +72,6 @@
             var dialogLang  = lang.dialog.metaData;
             var classPrefix = this.classPrefix;
 			      var dialogName  = classPrefix + pluginName, dialog;
-            var meta        = post.meta;
             
 			      cm.focus();
 			      
@@ -104,10 +103,10 @@
                                         "<input type=\"text\" value=\"" + (meta.tags || "") + "\" meta-tags />" +
                                         "<br/>" +
                                         "<label>" + dialogLang.date + "</label>" +
-                                        "<input type=\"text\" value=\"" + (post.date || "") + "\" meta-date />" +
+                                        "<input type=\"text\" value=\"" + (meta.date || "") + "\" meta-date />" +
                                         "<br/>" +
                                         "<label>" + dialogLang.slug + "</label>" +
-                                        "<input type=\"text\" value=\"" + (post.slug || "") + "\" meta-slug />" +
+                                        "<input type=\"text\" value=\"" + (meta.slug || "") + "\" meta-slug />" +
                                         "<br/>" +
                                         "<label>" + dialogLang.published + "</label>" +
                                         "<input type=\"checkbox\" meta-published " + (meta.published ? "checked" : "") + "/>" +

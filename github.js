@@ -1,26 +1,16 @@
-//-> Claud Modified for jekyller Need
-var root = null;
-/* Please replace with your own private Token */
-var access_token = null;
-
-chrome.storage.local.get({"access_token":null},function(o){
-	access_token = o.access_token;
-});
-
-
-chrome.runtime.getBackgroundPage(function(r) { root = r;});
-var gh = (function() {
+var Github = (function() {
   'use strict';
-  var signin_button;
-  var revoke_button;
-  var user_info_div;
   var user_fetch_callback;
+  var access_token;
+  var user_info;
 
   var tokenFetcher = (function() {
     // Replace clientId and clientSecret with values obtained by you for your
     // application https://github.com/settings/applications.
-    var clientId = 'eafd892b0fef691e2baa';
-    var clientSecret = '3dd2f8b9838b50641fec3e871df9ecc790ed0983';
+    // var clientId = 'eafd892b0fef691e2baa';
+    // var clientSecret = '3dd2f8b9838b50641fec3e871df9ecc790ed0983';
+    var clientId = '47bc556ab4c7b373dbfa';
+    var clientSecret = 'ba4b606c64371ba47c7aa551a8c803a2342703ae';
     var redirectUri = chrome.identity.getRedirectURL('provider_cb');
     var redirectRe = new RegExp(redirectUri + '[#\?](.*)');
 
@@ -39,7 +29,7 @@ var gh = (function() {
               '&scope=user,repo' +
               '&access_type=online' +
               '&redirect_uri=' + encodeURIComponent(redirectUri)
-        }
+        };
         chrome.identity.launchWebAuthFlow(options, function(redirectUri) {
           console.log('launchWebAuthFlow completed', chrome.runtime.lastError,
               redirectUri);
@@ -128,7 +118,7 @@ var gh = (function() {
         if (access_token == token_to_remove)
           access_token = null;
       }
-    }
+    };
   })();
 
   function xhrWithDataAuth(method, url, data, callback) {
@@ -160,7 +150,7 @@ var gh = (function() {
 
     function requestComplete() {
       //console.log('requestComplete', this.status, this.response);
-      if ( ( this.status < 200 || this.status >=300 ) && retry) {
+      if ( ( this.status < 200 || this.status >= 300 ) && retry) {
         retry = false;
         tokenFetcher.removeCachedToken(access_token);
         access_token = null;
@@ -202,7 +192,7 @@ var gh = (function() {
 
     function requestComplete() {
       //console.log('requestComplete', this.status, this.response);
-      if ( ( this.status < 200 || this.status >=300 ) && retry) {
+      if (( this.status < 200 || this.status >=300 ) && retry) {
         retry = false;
         tokenFetcher.removeCachedToken(access_token);
         access_token = null;
@@ -220,69 +210,33 @@ var gh = (function() {
                 onUserInfoFetched);
   }
 
-  // Functions updating the User Interface:
-
-  function showButton(button) {
-    button.style.display = 'inline';
-    button.disabled = false;
-  }
-
-  function hideButton(button) {
-    button.style.display = 'none';
-  }
-
-  function disableButton(button) {
-    button.disabled = true;
-  }
-
   function onUserInfoFetched(error, status, response) {
     if (!error && status == 200) {
       //console.log("Got the following user info: " + response);
-      root.user_info = JSON.parse(response);
-      //populateUserInfo(root.user_info);
-      //hideButton(signin_button);
-      //showButton(revoke_button);
-      //fetchUserRepos(root.user_info["repos_url"]);
+      user_info = JSON.parse(response);
       if (user_fetch_callback) {
-        user_fetch_callback(false, root.user_info);
+        user_fetch_callback(false, user_info);
       }
     } else {
       console.log('infoFetch failed', error, status);
       if (user_fetch_callback) {
         user_fetch_callback(true);
       }
-      //showButton(signin_button);
-			//$('.signin').click();
-			//interactiveSignIn();
     }
-  }
-
-  function populateUserInfo(user_info) {
-    //var elem = user_info_div;
-    //var nameElem = document.createElement('div');
-		console.info(user_info);
-    //nameElem.innerHTML = "Blog of : <a href='http://" +user_info.login+".github.io' target=_blank>"+user_info.login+"</a>";
-    //elem.innerHTML= nameElem.innerHTML;
   }
 
   function fetchUserRepos(repoUrl) {
     xhrWithAuth('GET', repoUrl, false, onUserReposFetched);
   }
 
-	// Jekyller - start
 	//-> Get the Post Folder Tree
-  function fetchPostList(user, cb) {
+  function fetchPostList(cb) {
+    var user = user_info.login;
   	xhrWithAuth('GET',
-			'https://api.github.com/repos/'+user+'/'+user+'.github.io/contents/_posts',
+			'https://api.github.com/repos/' + user + '/' + user + '.github.io/contents/_posts',
      	true,
 	    cb);
 	}
-
-	// Jekyller - end
-
-
-
-
   function onUserReposFetched(error, status, response) {
   	//console.log(response);
   }
@@ -303,17 +257,10 @@ var gh = (function() {
   function revokeToken() {
     // We are opening the web page that allows user to revoke their token.
     window.open('https://github.com/settings/applications');
-    // And then clear the user interface, showing the Sign in button only.
-    // If the user revokes the app authorization, they will be prompted to log
-    // in again. If the user dismissed the page they were presented with,
-    // Sign in button will simply sign them in.
-    user_info_div.textContent = '';
-    //hideButton(revoke_button);
-    //showButton(signin_button);
   }
 
   function fetchContent(ulink,cb) {
-    	xhrWithAuth("GET", "https://api.github.com/repos/"+root.user_info.login+"/"+root.user_info.login+".github.io/contents/"+ulink, true, function(e,s,r){
+    	xhrWithAuth("GET", "https://api.github.com/repos/"+user_info.login+"/"+user_info.login+".github.io/contents/"+ulink, true, function(e,s,r){
 				cb(e,s,r);
 			});
   }
@@ -332,12 +279,12 @@ var gh = (function() {
 				content:window.btoa(unescape(encodeURIComponent(content)))
 			};
 
-			if(sha=='') {
-				delete(data.sha);
+			if(sha === '') {
+				delete data.sha;
 			}
 			var sdata = JSON.stringify(data);
 
-			xhrWithDataAuth("PUT", "https://api.github.com/repos/"+root.user_info.login+"/"+root.user_info.login+".github.io/contents/"+ulink, sdata , function(e,s,r){
+			xhrWithDataAuth("PUT", "https://api.github.com/repos/"+user_info.login+"/"+user_info.login+".github.io/contents/"+ulink, sdata , function(e,s,r){
 				cb(e,s,r);
 			});
 		},
@@ -350,22 +297,22 @@ var gh = (function() {
 
 			var sdata = JSON.stringify(data);
 
-			xhrWithDataAuth("DELETE", "https://api.github.com/repos/"+root.user_info.login+"/"+root.user_info.login+".github.io/contents/"+ulink, sdata , function(e,s,r){
+			xhrWithDataAuth("DELETE", "https://api.github.com/repos/"+user_info.login+"/"+user_info.login+".github.io/contents/"+ulink, sdata , function(e,s,r){
 				cb(e,s,r);
 			});
 		},
 
-
-		getContent: function(url,cb) {
+		fetchPostContent: function(url,cb) {
 		  fetchContent(url,function(e,s,r){
-		    if(s==200){
-		      var tmp = JSON.parse(r);
+		    if(s == 200){
+		      var json = JSON.parse(r);
 		      cb({
 		        status:'OK',
-		        sha:  tmp.sha,
-		        content: decodeURIComponent(escape(window.atob(tmp.content))),
-		        date: tmp.name.replace(/^(\d+-\d+-\d+)-.*/,'$1'),
-		        url:  root.user_info.login+'.github.io/'+tmp.name.replace(/^\d+-\d+-\d+-/,'').replace(/.md$/,'')
+		        sha:  json.sha,
+		        content: decodeURIComponent(escape(window.atob(json.content))),
+		        filename: json.name,
+		        date: json.name.replace(/^(\d+-\d+-\d+)-.*/,'$1'),
+		        slug: json.name.replace(/^\d+-\d+-\d+-/,'').replace(/.md$/,'')
 		      });
 		    }
 		  });
@@ -382,28 +329,14 @@ var gh = (function() {
     getUserInfo: function(type) {
       return getUserInfo(type);
     },
-    
     login: function() {
-        getUserInfo(true);
+      getUserInfo(true);
     },
-    
-    onload: function () {
-      /*
-      signin_button = document.querySelector('#signin');
-      signin_button.onclick = interactiveSignIn;
-
-      revoke_button = document.querySelector('#revoke');
-      revoke_button.onclick = revokeToken;
-
-      user_info_div = document.querySelector('#user_info');
-
-      console.log(signin_button, revoke_button, user_info_div);
-
-      showButton(signin_button);
-      */
-      getUserInfo(false);
+    autoLogin: function() {
+      Storage.restoreAccessToken(function(accessToken) {
+        access_token = accessToken;
+        getUserInfo(false);
+      });
     }
   };
 })();
-
-window.onload = gh.onload;

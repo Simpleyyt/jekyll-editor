@@ -4,11 +4,6 @@
  * @see http://developer.chrome.com/apps/app.runtime.html
  * @see http://developer.chrome.com/apps/app.window.html
  */
-
-var user_info;	//git user info
-var gh;					//git handler
-
-
 chrome.app.runtime.onLaunched.addListener(function(launchData) {
   chrome.app.window.create('index.html', {
 		id: 'mainPage',

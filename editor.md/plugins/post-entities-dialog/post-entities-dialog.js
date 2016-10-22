@@ -141,7 +141,7 @@
 						{
 							var name = "Untitled";
 							if (entity.meta.title)
-							  name = entity.date + ' ' + entity.meta.title.replace("&amp;", "&");
+							  name = entity.meta.date + ' ' + entity.meta.title.replace("&amp;", "&");
 
 							row += "<a href=\"javascript:;\" value=\"" + i + "\" title=\"" + name + "\" class=\"" + classPrefix + "html-entity-btn\">" + name + "</a>";
 						}
