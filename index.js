@@ -1,6 +1,7 @@
 $(function() {
   var curpost;
   var postList = [];
+  var postsDialog;
   
   var initEditor = function() {
     editor = editormd("editormd", {
@@ -8,6 +9,8 @@ $(function() {
       width   : "100%",
       height : 100,
       emoji : true,
+      lang : langs[langName],
+      
       toolbarIcons : function() {
           // Or return editormd.toolbarModes[name]; // full, simple, mini
           // Using "||" set icons align right.
@@ -21,21 +24,38 @@ $(function() {
             "||",
             "login", "preview", "new", "postentities", "meta", "commit", "help", "info"];
       },
+      
       onload : function() {
         //Fix Bug: editor not extend when empty
         editor.setMarkdown(" ");
         //force fullscreen (just the content)
         this.fullscreen();
+        
+        //Load local posts
         Storage.restorePost(Post.new(), function(post) {
           curpost = post;
           editor.setMarkdown(post.content);
         });
+        Storage.restorePosts(postList, function(posts) {
+          postList = posts;
+          postList.unshift({ loading: true});
+          if (postsDialog)
+            postsDialog.setPostEntities(postList);
+        });
+        
         Github.onUserFetched(function(error, user_info) {
           if (!error) {
             //this.toolbar.find(".fa[name=login]").html(user_info.login);
             this.settings.toolbarIconTexts.login = user_info.login;
             this.settings.lang.toolbar.login = user_info.login;
             this.setToolbar();
+            // sync the posts
+            Post.sync(postList, function(posts) {
+              postList = posts;
+              Storage.savePosts(postList);
+              if (postsDialog)
+                postsDialog.setPostEntities(postList);
+            });
           } else {
             this.settings.toolbarIconTexts.login = this.lang.toolbar.login;
             this.settings.lang.toolbar.login = this.lang.toolbar.login;
@@ -45,10 +65,12 @@ $(function() {
         //login at startup
         Github.autoLogin();
       },
+      
       onfullscreenExit : function() {
         //force full screen
         this.fullscreen();
       },
+      
       onchange : function() {
         curpost.content = editor.getMarkdown();
         Storage.savePost(curpost);
@@ -64,6 +86,7 @@ $(function() {
           });
         });
       },
+      
       toolbarIconsClass : {
           new : "fa-file",
           postentities : "fa-bars",
@@ -75,8 +98,7 @@ $(function() {
           //customer icon and text
           login : "<i class=\"fa fa-spinner fa-spin\"></i>"
       },
-
-      lang : langs[langName],
+      
       toolbarHandlers : {
           new : function(cm, icon, cursor, selection) {
             this.confirmDialog(this.lang.dialog.warn.title, this.lang.dialog.warn.content, function(ok) {
@@ -86,12 +108,14 @@ $(function() {
               }
             });
           },
+          
           login : function(cm, icon, cursor, selection) {
             Github.login();
             this.settings.toolbarIconTexts.login = "<i class=\"fa fa-spinner fa-spin\"></i>";
             this.settings.lang.toolbar.login = this.lang.toolbar.login + "...";
             this.setToolbar();
           },
+          
           commit : function(cm, icon, cursor, selecton) {
             this.confirmDialog(this.lang.dialog.commit.title, this.lang.dialog.commit.content, function(ok) {
               if (ok) {
@@ -112,8 +136,9 @@ $(function() {
               }
             }.bind(this));
           },
+          
           postentities : function(cm, icon, cursor, selection) {
-            var dialog = editor.postEntitiesDialog([], true, function(ok, selected) {
+              postsDialog = editor.postEntitiesDialog([], true, function(ok, selected) {
               if (ok) {
                 editor.confirmDialog(editor.lang.dialog.warn.title, editor.lang.dialog.warn.content, function(ok) {
                   if (ok) {
@@ -123,13 +148,10 @@ $(function() {
                 });
               }
             });
-            dialog.loading(true);
-            Post.getPosts(function(posts) {
-              postList = posts;
-              dialog.setPostEntities(posts);
-              dialog.loading(false);
-            });
+            postsDialog.setPostEntities(postList);
+            //dialog.loading(true);
           },
+          
           meta : function(cm, icon, cursor, selection) {
             this.metaDataDialog(curpost.meta, function(ok, meta) {
               if (ok) {
@@ -140,6 +162,7 @@ $(function() {
           }
       }
     });
+    
     $(window).resize(function() {
       console.log("window resize");
       editor.fullscreenExit();

@@ -21,21 +21,24 @@
 			"zh-cn" : {
 				dialog : {
 					postEntities : {
-						title : "博文列表"
+						title : "博文列表",
+				    loading : "加载中..."
 					}
 				}
 			},
 			"zh-tw" : {
 				dialog : {
 					postEntities : {
-						title : "博文列表"
+						title : "博文列表",
+				    loading : "加载中..."
 					}
 				}
 			},
 			"en" : {
 				dialog : {
 					postEntities : {
-						title : "Post List"
+						title : "Post List",
+				    loading : "loading..."
 					}
 				}
 			}
@@ -96,7 +99,7 @@
 						enter  : [lang.buttons.enter, function() {							
 							//cm.replaceSelection(selecteds.join(" "));
 							if (callback) {
-							  if (selected >= 0) {
+							  if (selected >= 0 && !entitiesData[selected].loading) {
 							    callback(true, selected);
 							  } else {
 							    callback(false);
@@ -137,13 +140,19 @@
 					{
 						var entity = entitiesData[(i * rowNumber) + x];
 						
+						if (entity.loading) {
+						  row += "<a href=\"javascript:;\" value=\"" + i + "\" title=\"" + dialogLang.loading + 
+							  "\" class=\"" + classPrefix + "html-entity-btn\">" + dialogLang.loading + "</a>";
+							continue;
+						}
 						if (typeof entity !== "undefined")
 						{
 							var name = "Untitled";
 							if (entity.meta.title)
-							  name = entity.meta.date + ' ' + entity.meta.title.replace("&amp;", "&");
+							  name = entity.meta.date + '\t' + entity.meta.title.replace("&amp;", "&");
 
-							row += "<a href=\"javascript:;\" value=\"" + i + "\" title=\"" + name + "\" class=\"" + classPrefix + "html-entity-btn\">" + name + "</a>";
+							row += "<a href=\"javascript:;\" value=\"" + i + "\" title=\"" + name + 
+							  "\" class=\"" + classPrefix + "html-entity-btn\" style=\"text-align: left; padding-left: 10%;\">" + name + "</a>";
 						}
 					}
 					
@@ -172,8 +181,10 @@
 			*/
 			
 			return {
-			  loading: function(show) {
-			    loading[(show) ? "show" : "hide"]();
+			  loading: function() {
+			    entitiesData = [{ loading: true}];
+			    drawTable();
+			    //loading[(show) ? "show" : "hide"]();
 			  },
 			  setPostEntities: function(entities) {
 			    entitiesData = entities;

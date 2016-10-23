@@ -1,5 +1,6 @@
 var Resource = {
   _cache: {},
+  
   load: function loadImage(url, callback){
     callback = callback || function() {};
     if(typeof(Resource._cache[url])!='undefined') {

@@ -17,30 +17,59 @@ var Post = {
       sha: null
     };
   },
-  getPosts: function(callback) {
+  
+  sync: function(posts, callback) {
 		callback = callback || function() {};
-		var posts = [];
-	  Github.fetchPostList(function(e, s, r) {
+		var postMap = {};
+		posts.forEach(function(post) {
+		  if (post.sha)
+		    postMap[post.sha] = post;
+		});
+    Github.fetchPostList(function(e, s, r) {
 		  var post_infos = JSON.parse(r);
 		  var count = post_infos.length;
+		  var newPosts = [];
+  		function pushPosts(post) {
+  		  newPosts.push(post);
+  		  if (newPosts.length == post_infos.length) {
+  		    callback(Post._sortPost(newPosts));
+  		  }
+  		}
 		  post_infos.forEach(function(post_info) {
-		    Github.fetchPostContent(post_info.path, function(c) {
-          var post = Post.parse(c.content);
-          if(c.date.match(/\d+-\d+-\d+/) === null) {
-    				return;
-          }
-          post['sha'] = c.sha;
-          post.meta.slug = c.slug;
-          post.meta.date = c.date;
-          posts.push(post);
-          count--;
-          if (count === 0) {
-            callback(posts);
-          }
-		    });
+		    post = postMap[post_info.sha];
+		    if (post !== null && post !== undefined) {
+		      pushPosts(postMap[post_info.sha]);
+		    } else {
+		      Post._fetchPost(post_info.path, function(post) {
+		        pushPosts(post);
+		      });
+		    }
 		  });
 	  });
   },
+  
+  _fetchPost: function(path, callback) {
+    Github.fetchPostContent(path, function(c) {
+      var post = Post.parse(c.content);
+      post['sha'] = c.sha;
+      post.meta.slug = c.slug;
+      post.meta.date = c.date;
+      callback(post);
+		});
+  },
+  
+  _sortPost: function(posts) {
+    return posts.sort(function(a, b) {
+      var date1 = new Date(a.meta.date);
+      var date2 = new Date(b.meta.date);
+      if (date1 > date2)
+        return -1;
+      if (date1 < date2)
+        return 1;
+      return 0;
+    });
+  },
+  
   update: function(post, callback) {
     callback = callback || function() {};
     var name = post.meta.date +'-'+ post.meta.slug;
@@ -53,6 +82,7 @@ var Post = {
   	Github.updateContent(path, filename, content, sha, function(e, s, r){
   		var json = JSON.parse(r);
   		if(s == '200') {	//Done
+  		  post.sha = json.content.sha;
   			callback(false, "updated");
   		} else if(s == '201') { //Created
   		  post.sha = json.content.sha;
@@ -64,6 +94,7 @@ var Post = {
   		}
   	});
   },
+  
   dump: function(post) {
   	var rst='';
   	var contentstr = post.content;
@@ -84,6 +115,7 @@ var Post = {
   	rst = rst + contentstr;
   	return rst;
   },
+  
   parse: function(rawContent) {
     var mt;
     //get the yaml matters
