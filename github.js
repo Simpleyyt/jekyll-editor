@@ -7,10 +7,10 @@ var Github = (function() {
   var tokenFetcher = (function() {
     // Replace clientId and clientSecret with values obtained by you for your
     // application https://github.com/settings/applications.
-    // var clientId = 'eafd892b0fef691e2baa';
-    // var clientSecret = '3dd2f8b9838b50641fec3e871df9ecc790ed0983';
-    var clientId = '47bc556ab4c7b373dbfa';
-    var clientSecret = 'ba4b606c64371ba47c7aa551a8c803a2342703ae';
+    var clientId = 'eafd892b0fef691e2baa';
+    var clientSecret = '3dd2f8b9838b50641fec3e871df9ecc790ed0983';
+    //var clientId = '47bc556ab4c7b373dbfa';
+    //var clientSecret = 'ba4b606c64371ba47c7aa551a8c803a2342703ae';
     var redirectUri = chrome.identity.getRedirectURL('provider_cb');
     var redirectRe = new RegExp(redirectUri + '[#\?](.*)');
 

@@ -1,8 +1,6 @@
 # Jekyll Editor
 
-A chrome app to write jekyll post.
-
-Fork from  <https://github.com/shinemoon/jekyller>.
+A chrome web app to write jekyll post.
 
 [Get it from chrome store](https://chrome.google.com/webstore/detail/jekyll-editor/dfdkgbhjmllemfblfoohhehdigokocme).
 
