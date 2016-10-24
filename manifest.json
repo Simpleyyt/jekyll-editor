@@ -3,7 +3,7 @@
   "name": "Jekyll Editor",
   "short_name": "Jekyll Editor",
   "description": "An markdown editor to write jekyll post.",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "default_locale": "en",
   "minimum_chrome_version": "33",
   "icons": {
