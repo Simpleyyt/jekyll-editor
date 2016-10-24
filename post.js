@@ -12,7 +12,7 @@ var Post = {
   		slug: 'the-post-' + parseInt(10000 * Math.random())
   	};
     return {
-      content: null,
+      content: "",
       meta: meta,
       sha: null
     };
@@ -75,10 +75,8 @@ var Post = {
     var name = post.meta.date +'-'+ post.meta.slug;
     var content = Post.dump(post);
     var sha = post.sha;
-    console.log(sha);
     var filename = name + '.md';
     var path = '_posts/'+ filename;
-    console.log(path);
   	Github.updateContent(path, filename, content, sha, function(e, s, r){
   		var json = JSON.parse(r);
   		if(s == '200') {	//Done
@@ -124,6 +122,9 @@ var Post = {
     mt = {};
     mt['meta'] = YAML.parse(res[1]);
     mt['content'] = res[3];
+    if (mt.meta.published === undefined || mt.meta.published === null) {
+      mt.meta.published = true;
+    }
     return mt;
   }
 };

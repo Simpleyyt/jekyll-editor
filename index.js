@@ -3,6 +3,17 @@ $(function() {
   var postList = [];
   var postsDialog;
   
+      
+  var syncPosts = function() {
+    // sync the posts
+    Post.sync(postList, function(posts) {
+      postList = posts;
+      Storage.savePosts(postList);
+      if (postsDialog)
+        postsDialog.setPostEntities(postList);
+    });
+  };
+  
   var initEditor = function() {
     editor = editormd("editormd", {
       path : "editor.md/lib/", // Autoload modules mode, codemirror, marked... dependents libs path
@@ -49,13 +60,7 @@ $(function() {
             this.settings.toolbarIconTexts.login = user_info.login;
             this.settings.lang.toolbar.login = user_info.login;
             this.setToolbar();
-            // sync the posts
-            Post.sync(postList, function(posts) {
-              postList = posts;
-              Storage.savePosts(postList);
-              if (postsDialog)
-                postsDialog.setPostEntities(postList);
-            });
+            syncPosts();
           } else {
             this.settings.toolbarIconTexts.login = this.lang.toolbar.login;
             this.settings.lang.toolbar.login = this.lang.toolbar.login;
@@ -130,6 +135,19 @@ $(function() {
                     dialog.setTitle(this.lang.dialog.succ.title);
                     dialog.setContent(this.lang.dialog.succ.content[msg]);
                     Storage.savePost(curpost);
+                    //update post list
+                    if (msg == "created") {
+                      postList.unshift($.extend({}, curpost));
+                    }
+                    else if (msg == "updated") {
+                      for (var i = 0; i < postList.length; i++) {
+                        if (postList[i].sha == curpost.sha) {
+                          postList[i] = $.extend({}, curpost);
+                        }
+                      }
+                    }
+                    if (postsDialog)
+                      postsDialog.setPostEntities(postList);
                   }
                   dialog.loading(false);
                 }.bind(this));

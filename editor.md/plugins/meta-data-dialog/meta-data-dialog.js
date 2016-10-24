@@ -85,8 +85,13 @@
                     "title": "",
                     "layout": "post",
                     "categories": "",
-                    "tags": ""
+                    "tags": "",
+                    "published": false
                   };
+                }
+                
+                if (meta.published === null || meta.published === undefined) {
+                  meta.published = true;
                 }
                 
                 var dialogHTML = "<div class=\"" + classPrefix + "form\">" +
@@ -135,7 +140,7 @@
                             var tags = this.find("[meta-tags]").val();
                             var slug = this.find("[meta-slug]").val();
                             var date = this.find("[meta-date]").val();
-                            var published = this.find('[meta-published]').val() == 'on';
+                            var published = this.find('[meta-published]').prop("checked");
                             
                             var meta = {
                               "title": title,
