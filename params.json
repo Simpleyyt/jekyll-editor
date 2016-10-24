@@ -1,0 +1,6 @@
+{
+  "name": "Jekyll-editor",
+  "tagline": "A markdown editor to write jekyll post.",
+  "body": "# Jekyll Editor\r\n\r\nA chrome web app to write jekyll post.\r\n\r\n[Get it from chrome store](https://chrome.google.com/webstore/detail/jekyll-editor/dfdkgbhjmllemfblfoohhehdigokocme).\r\n\r\n![Jekyll Editor](http://simpleyyt.qiniudn.com/15-10-11/10214115.jpg)\r\n\r\n## Features\r\n\r\n * Get post list from github(`_post` directory in `<yourname>.github.io` repository)\r\n * Auto save post to local\r\n * Powerful markdown editor, fork from https://github.com/pandao/editor.md\r\n \r\n## Bugs\r\n\r\n * Maybe stuck when getting the post list sometimes\r\n * Something wrong with the scrollbar in markdown editor",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
