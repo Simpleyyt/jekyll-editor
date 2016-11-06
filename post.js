@@ -1,7 +1,9 @@
 var Post = {
   new: function() {
   	var date = new Date();
-  	var datestr = date.getFullYear() + '-' + (Number(date.getMonth()) + 1) + '-' + date.getDate();
+  	var datestr = date.getFullYear() + '-' + 
+  	  ("0" + (date.getMonth() + 1)).slice(-2) + '-' + 
+  	  ("0" + date.getDate()).slice(-2);
   	var meta = {
   		categories: 'Uncategoried',
   		tags: '',
