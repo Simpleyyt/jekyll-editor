@@ -20,15 +20,16 @@ $(function() {
       width   : "100%",
       height : 100,
       emoji : true,
+      tex : true,
       lang : langs[langName],
       
       toolbarIcons : function() {
           // Or return editormd.toolbarModes[name]; // full, simple, mini
           // Using "||" set icons align right.
           return [
-            "undo", "redo", "|", 
-            "bold", "del", "italic", "quote", "ucwords", "uppercase", "lowercase", "|", 
-            "h1", "h2", "h3", "h4", "|", 
+            "undo", "redo", "|",
+            "bold", "del", "italic", "quote", "ucwords", "uppercase", "lowercase", "|",
+            "h1", "h2", "h3", "h4", "|",
             "list-ul", "list-ol", "hr", "|",
             "link", "reference-link", "image", "code", "preformatted-text", "code-block", "table", "datetime", "emoji", "html-entities", "pagebreak", "|",
             "search", "|",
